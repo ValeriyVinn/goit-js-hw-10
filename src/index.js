@@ -15,16 +15,15 @@ countryInput.addEventListener(
 );
 
 function onCountryInput() {
-  
   const name = countryInput.value.trim();
   if (name === '') {
-    return (countryList.innerHTML = ''), (countryInfo.innerHTML = '');
+    clearInnerHTML();
+    return;
   }
 
   fetchCountries(name)
     .then(country => {
-      countryList.innerHTML = '';
-      countryInfo.innerHTML = '';
+      clearInnerHTML();
 
       if (country.length === 1) {
         countryInfo.insertAdjacentHTML('beforeend', markupCountryInfo(country));
@@ -34,7 +33,13 @@ function onCountryInput() {
         countryList.insertAdjacentHTML('beforeend', markupCountryList(country));
       }
     })
-    .catch(ifWrongNameAlert);
+    .catch(error => {
+      if (error.message === '404') {
+        ifWrongNameAlert();
+      }
+      clearInnerHTML();
+      console.log(error.message);
+    });
 }
 
 function ifTooManyMatchesAlert() {
@@ -84,4 +89,9 @@ function markupCountryInfo(country) {
     })
     .join('');
   return layoutCountryInfo;
+}
+
+function clearInnerHTML() {
+  countryList.innerHTML = '';
+  countryInfo.innerHTML = '';
 }
